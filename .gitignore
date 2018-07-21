@@ -104,4 +104,5 @@ venv.bak/
 .mypy_cache/
 
 faces/
+out/
 *.csv
