@@ -1,0 +1,25 @@
+face:
+    x: 100
+    y: 700
+qr:
+    x: 400
+    y: 700
+name:
+    font:
+        face: arial
+        size_pt: 50
+    align: center
+    x: 300
+    y: 600
+company1:
+    font:
+        face: courbd
+        size_pt: 18
+    x: 150
+    y: 600
+company2:
+    font:
+        face: courbd
+        size_pt: 18
+    x: 150
+    y: 630

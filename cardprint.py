@@ -1,6 +1,7 @@
 import sys
 import os
 import csv
+import yaml
 import datetime
 from PIL import Image
 from PIL import ImageFont
@@ -8,26 +9,99 @@ from PIL import ImageDraw
 import pyqrcode
 
 
+T_CMP1 = 'lisainfo'
+T_CMP2 = 'lisainfo2'
+T_SURNAME = 'perenimi'
+T_FORENAME = 'eesnimi'
+T_QRCODE = 'kood'
+T_LAYOUT = 'taustafail'
+T_FACE = 'pildifail'
+
+
+def getCenterOffset(draw, text, x, y, font):
+    w, h = draw.textsize(text, font=font)
+    print('offsetting ', x, w//2, '=', x-w//2)
+    return (x-w//2, y)
+
+
+def getColorTuple(o):
+    if 'color' in o:
+        return (o['color']['R'],
+                o['color']['G'],
+                o['color']['B'])
+    else:
+        return (0, 0, 0)
+
+
+def getFont(font):
+    return ImageFont.truetype(font['face'] + '.ttf', font['size_pt'])
+
+
 def printCard(card):
-    bg_fn = os.path.join(confdir, card['taustafail'])
-    face_fn = os.path.join(facesdir, card['pildifail'])
-    out_fn = os.path.join(outdir, card['kood']+'.png')
+    bg_fn = os.path.join(confdir, card[T_LAYOUT] + '.png')
+    layout_fn = os.path.join(confdir, card[T_LAYOUT] + '.yaml')
+    face_fn = os.path.join(facesdir, card[T_FACE])
+    out_fn = os.path.join(outdir, card[T_QRCODE]+'.png')
+
+    with open(layout_fn, 'r', encoding='utf-8') as layout_file:
+        layout = yaml.load(layout_file)
+    print(layout)
 
     bg_img = Image.open(bg_fn)
     face_img = Image.open(face_fn)
 
-    face_offset = (100, 700)
-    qr_offset = (400, 700)
+    face_offset = (layout['face']['x'], layout['face']['y'])
     bg_img.paste(face_img, face_offset)
     draw = ImageDraw.Draw(bg_img)
-    font = ImageFont.truetype("arial.ttf", 50)
-    font2 = ImageFont.truetype("courbd.ttf", 22)
-    draw.text((150, 550), card['eesnimi'], (0, 0, 0), font=font)
-    draw.text((200, 600), card['perenimi'], (0, 0, 0), font=font)
-    draw.text((150, 650), card['lisainfo'], (0, 0, 0), font=font2)
+
+    name_font = getFont(layout['name']['font'])
+    name_align = layout['name'].get('align', 'left')
+    name_color = getColorTuple(layout['name'])
+    if 'surname' in layout['name']:
+        surname_color = getColorTuple(layout['name']['surname'])
+        surname_font = getFont(layout['name']['font'])
+        if 'font' in layout['name']['surname']:
+            surname_font = getFont(layout['name']['surname']['font'])
+        if name_align == 'center':
+            name_offset = getCenterOffset(
+                draw, card[T_FORENAME],
+                layout['name']['x'], layout['name']['y'],
+                name_font
+            )
+            surname_offset = getCenterOffset(
+                draw, card[T_SURNAME],
+                layout['name']['surname']['x'], layout['name']['surname']['y'],
+                surname_font)
+        else:
+            name_offset = (layout['name']['x'], layout['name']['y'])
+            surname_offset = (layout['name']['surname']['x'],
+                              layout['name']['surname']['y'])
+        draw.text(name_offset, card[T_FORENAME], name_color, font=name_font)
+
+        draw.text(surname_offset,
+                  card[T_SURNAME],
+                  surname_color,
+                  font=surname_font)
+    else:
+        if name_align == 'center':
+            name_offset = getCenterOffset(
+                draw, card[T_FORENAME] + ' ' + card[T_SURNAME],
+                layout['name']['x'], layout['name']['y'],
+                name_font
+            )
+        draw.text(name_offset,
+                  card[T_FORENAME] + ' ' + card[T_SURNAME],
+                  name_color, font=name_font)
+
+    comp_font = ImageFont.truetype(
+        layout['company1']['font']['face'] + '.ttf',
+        layout['company1']['font']['size_pt'])
+    comp_offset = (layout['company1']['x'], layout['company1']['y'])
+    comp_color = (0, 0, 0)
+    draw.text(comp_offset, card[T_CMP1], comp_color, font=comp_font)
 
     qrcode = pyqrcode.create(
-        card['kood'],
+        card[T_QRCODE],
         error='H',
         version=1,
         mode='numeric'
@@ -38,8 +112,10 @@ def printCard(card):
         module_color=[0, 0, 0, 128],
         background=[0xff, 0xff, 0xcc]
         )
-    qr_img = Image.open(tmp_code_fn)
+    qr_img = Image.open(tmp_code_fn).convert("RGBA")
+    qr_offset = (layout['qr']['x'], layout['qr']['y'])
     bg_img.paste(qr_img, qr_offset)
+    print('foo')
     bg_img.save(out_fn)
 
 
@@ -76,5 +152,5 @@ with open(sys.argv[1], newline='') as csvfile:
             printCard(card)
 
 # Cleanup
-os.rename(datafile_fn, os.path.join(outdir, datafile_bn))
+# os.rename(datafile_fn, os.path.join(outdir, datafile_bn))
 os.remove(tmp_code_fn)
