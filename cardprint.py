@@ -1,6 +1,7 @@
 import sys
 import os
 import csv
+import datetime
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
@@ -8,13 +9,13 @@ import pyqrcode
 
 
 def printCard(card):
-    bg_fn = os.path.join(datadir, card['taustafail'])
-    face_fn = os.path.join(datadir, card['pildifail'])
-    out_fn = os.path.join(datadir, card['kood']+'.png')
-    tmp_code_fn = os.path.join(datadir, 'code.png')
-    print(bg_fn, face_fn, out_fn)
+    bg_fn = os.path.join(confdir, card['taustafail'])
+    face_fn = os.path.join(facesdir, card['pildifail'])
+    out_fn = os.path.join(outdir, card['kood']+'.png')
+
     bg_img = Image.open(bg_fn)
     face_img = Image.open(face_fn)
+
     face_offset = (100, 700)
     qr_offset = (400, 700)
     bg_img.paste(face_img, face_offset)
@@ -42,8 +43,25 @@ def printCard(card):
     bg_img.save(out_fn)
 
 
-datadir = os.path.dirname(sys.argv[1])
+# Setup
+datafile_fn = sys.argv[1]
+datafile_bn = os.path.basename(datafile_fn)
+exedir = os.path.dirname(sys.argv[0])
+now = datetime.datetime.now()
+outdir = os.path.join(
+    exedir, 'out',
+    datetime.datetime.now().isoformat()
+    .replace('T', '_').replace('-', '').replace(':', '')
+    .split('.')[0]
+)
+if not os.path.exists(outdir):
+    os.mkdir(outdir)
+confdir = os.path.join(exedir, 'configuration')
+facesdir = os.path.join(exedir, 'faces')
+tmp_code_fn = os.path.join(exedir, 'code.png')
 
+
+# Main
 with open(sys.argv[1], newline='') as csvfile:
     csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
     firstrow = True
@@ -56,3 +74,7 @@ with open(sys.argv[1], newline='') as csvfile:
             values = list(map(str.strip, row))
             card = dict(zip(labels, values))
             printCard(card)
+
+# Cleanup
+os.rename(datafile_fn, os.path.join(outdir, datafile_bn))
+os.remove(tmp_code_fn)
