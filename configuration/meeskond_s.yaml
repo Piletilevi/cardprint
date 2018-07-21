@@ -1,9 +1,20 @@
 face:
-    x: 100
+    x: 110
     y: 700
 qr:
-    x: 425
-    y: 800
+    code:
+        x: 425
+        y: 800
+    text:
+        font:
+            face: courbd
+            size_pt: 48
+        x: 105
+        y: 25
+        color:
+            R: 200
+            G: 200
+            B: 0
 name:
     font:
         face: arial

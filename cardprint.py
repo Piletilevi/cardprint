@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 import sys
 import os
 import csv
@@ -9,13 +11,22 @@ from PIL import ImageDraw
 import pyqrcode
 
 
-T_CMP1 = 'lisainfo'
-T_CMP2 = 'lisainfo2'
-T_SURNAME = 'perenimi'
 T_FORENAME = 'eesnimi'
-T_QRCODE = 'kood'
-T_LAYOUT = 'taustafail'
+T_SURNAME = 'perenimi'
+T_COMPANY1 = 'lisainfo'
+T_COMPANY2 = 'lisainfo2'
+T_GROUP = 'kaardigrupp'
 T_FACE = 'pildifail'
+T_QRCODE = 'kood'
+
+K_GRUPP = {
+    'Meeskond': 'meeskond',
+    'Meeskond (söögiga)': 'meeskond_s',
+    'ESINEJA': 'esineja',
+    'ESINEJA (söögiga)': 'esineja_s',
+    'Press': 'press',
+    'Press (söögiga)': 'press_s'
+}
 
 
 def getCenterOffset(draw, text, x, y, font):
@@ -38,8 +49,8 @@ def getFont(font):
 
 
 def printCard(card):
-    bg_fn = os.path.join(confdir, card[T_LAYOUT] + '.png')
-    layout_fn = os.path.join(confdir, card[T_LAYOUT] + '.yaml')
+    bg_fn = os.path.join(confdir, K_GRUPP[card[T_GROUP]] + '.png')
+    layout_fn = os.path.join(confdir, K_GRUPP[card[T_GROUP]] + '.yaml')
     out_fn = os.path.join(outdir, card[T_QRCODE]+'.png')
 
     with open(layout_fn, 'r', encoding='utf-8') as layout_file:
@@ -49,7 +60,7 @@ def printCard(card):
     bg_img = Image.open(bg_fn)
 
     if T_FACE in card:
-        face_fn = os.path.join(facesdir, card[T_FACE])
+        face_fn = os.path.join(facesdir, card[T_FACE]+'.png')
         face_img = Image.open(face_fn)
         face_offset = (layout['face']['x'], layout['face']['y'])
         bg_img.paste(face_img, face_offset)
@@ -95,12 +106,10 @@ def printCard(card):
                   card[T_FORENAME] + ' ' + card[T_SURNAME],
                   name_color, font=name_font)
 
-    comp_font = ImageFont.truetype(
-        layout['company1']['font']['face'] + '.ttf',
-        layout['company1']['font']['size_pt'])
+    comp_font = getFont(layout['company1']['font'])
     comp_offset = (layout['company1']['x'], layout['company1']['y'])
     comp_color = (0, 0, 0)
-    draw.text(comp_offset, card[T_CMP1], comp_color, font=comp_font)
+    draw.text(comp_offset, card[T_COMPANY1], comp_color, font=comp_font)
 
     qrcode = pyqrcode.create(
         card[T_QRCODE],
@@ -111,13 +120,18 @@ def printCard(card):
     qrcode.png(
         tmp_code_fn,
         scale=6,
-        module_color=[0, 0, 0, 128],
-        background=[0xff, 0xff, 0xcc]
+        module_color=[0, 0, 0, 0],
+        background=[0xff, 0xff, 0xff]
         )
     qr_img = Image.open(tmp_code_fn).convert("RGBA")
-    qr_offset = (layout['qr']['x'], layout['qr']['y'])
-    bg_img.paste(qr_img, qr_offset)
-    print('foo')
+    qr_code_offset = (layout['qr']['code']['x'], layout['qr']['code']['y'])
+    bg_img.paste(qr_img, qr_code_offset)
+    qr_text_offset = (layout['qr']['text']['x'], layout['qr']['text']['y'])
+    qr_font = getFont(layout['qr']['text']['font'])
+    qr_color = getColorTuple(layout['qr']['text'])
+    draw.text(qr_text_offset,
+              card[T_QRCODE],
+              qr_color, font=qr_font)
     bg_img.save(out_fn)
 
 
@@ -140,7 +154,7 @@ tmp_code_fn = os.path.join(exedir, 'code.png')
 
 
 # Main
-with open(sys.argv[1], newline='') as csvfile:
+with open(sys.argv[1], newline='', encoding='utf-8') as csvfile:
     csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
     firstrow = True
     labels = 'foo'

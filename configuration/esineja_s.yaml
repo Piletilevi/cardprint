@@ -11,13 +11,6 @@ name:
     align: center
     x: 300
     y: 600
-    surname:
-        font:
-            face: arial
-            size_pt: 50
-        align: center
-        x: 300
-        y: 600
 company1:
     font:
         face: courbd
