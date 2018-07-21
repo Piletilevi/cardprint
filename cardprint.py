@@ -40,7 +40,6 @@ def getFont(font):
 def printCard(card):
     bg_fn = os.path.join(confdir, card[T_LAYOUT] + '.png')
     layout_fn = os.path.join(confdir, card[T_LAYOUT] + '.yaml')
-    face_fn = os.path.join(facesdir, card[T_FACE])
     out_fn = os.path.join(outdir, card[T_QRCODE]+'.png')
 
     with open(layout_fn, 'r', encoding='utf-8') as layout_file:
@@ -48,10 +47,13 @@ def printCard(card):
     print(layout)
 
     bg_img = Image.open(bg_fn)
-    face_img = Image.open(face_fn)
 
-    face_offset = (layout['face']['x'], layout['face']['y'])
-    bg_img.paste(face_img, face_offset)
+    if T_FACE in card:
+        face_fn = os.path.join(facesdir, card[T_FACE])
+        face_img = Image.open(face_fn)
+        face_offset = (layout['face']['x'], layout['face']['y'])
+        bg_img.paste(face_img, face_offset)
+
     draw = ImageDraw.Draw(bg_img)
 
     name_font = getFont(layout['name']['font'])
