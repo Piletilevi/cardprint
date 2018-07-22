@@ -22,10 +22,11 @@ T_QRCODE = 'kood'
 K_GRUPP = {
     'Meeskond': 'meeskond',
     'Meeskond (söögiga)': 'meeskond_s',
-    'ESINEJA': 'esineja',
-    'ESINEJA (söögiga)': 'esineja_s',
+    'Esineja': 'esineja',
+    'Esineja (söögiga)': 'esineja_s',
     'Press': 'press',
-    'Press (söögiga)': 'press_s'
+    'Press (söögiga)': 'press_s',
+    'Meeskond Super': 'meeskond_super'
 }
 
 
@@ -49,17 +50,17 @@ def getFont(font):
 
 
 def printCard(card):
+    print('Printing:', card)
     bg_fn = os.path.join(confdir, K_GRUPP[card[T_GROUP]] + '.png')
     layout_fn = os.path.join(confdir, K_GRUPP[card[T_GROUP]] + '.yaml')
     out_fn = os.path.join(outdir, card[T_QRCODE]+'.png')
 
     with open(layout_fn, 'r', encoding='utf-8') as layout_file:
         layout = yaml.load(layout_file)
-    print(layout)
 
     bg_img = Image.open(bg_fn)
 
-    if T_FACE in card:
+    if T_FACE in card and card[T_FACE]:
         face_fn = os.path.join(facesdir, card[T_FACE]+'.png')
         face_img = Image.open(face_fn)
         face_offset = (layout['face']['x'], layout['face']['y'])

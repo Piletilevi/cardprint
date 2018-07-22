@@ -4,47 +4,47 @@ face:
 qr:
     code:
         x: 425
-        y: 800
+        y: 802
     text:
         font:
-            face: courbd
-            size_pt: 48
-        x: 105
-        y: 25
+            face: RobotoSlab-Regular
+            size_pt: 24
+        x: 470
+        y: 760
         color:
-            R: 200
-            G: 200
+            R: 0
+            G: 0
             B: 0
 name:
     font:
-        face: arial
-        size_pt: 60
-    align: center
-    x: 350
-    y: 500
+        face: RobotoSlab-Regular
+        size_pt: 45
+    align: left
+    x: 130
+    y: 530
     surname:
         font:
-            face: arial
-            size_pt: 35
-        x: 350
-        y: 550
+            face: RobotoSlab-Regular
+            size_pt: 45
+        x: 130
+        y: 570
         color:
             R: 0
-            G: 200
+            G: 0
             B: 0
     color:
-        R: 200
+        R: 0
         G: 0
         B: 0
 company1:
     font:
-        face: courbd
-        size_pt: 18
-    x: 150
-    y: 600
+        face: RobotoSlab-Regular
+        size_pt: 24
+    x: 140
+    y: 640
 company2:
     font:
-        face: courbd
-        size_pt: 18
+        face: RobotoSlab-Regular
+        size_pt: 24
     x: 150
-    y: 630
+    y: 650
