@@ -1,7 +1,7 @@
 # cardprint
 
 ### To install
-- have python 3
+- have python 3; on OSx see [Installing Python 3 on Mac OS X](https://docs.python-guide.org/starting/install3/osx/)
 - pip install pyqrcode
 - pip install pypng
 
