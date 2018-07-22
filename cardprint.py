@@ -147,6 +147,8 @@ outdir = os.path.join(
     .replace('T', '_').replace('-', '').replace(':', '')
     .split('.')[0]
 )
+if not os.path.exists(os.path.join(exedir, 'out')):
+    os.mkdir(os.path.join(exedir, 'out'))
 if not os.path.exists(outdir):
     os.mkdir(outdir)
 confdir = os.path.join(exedir, 'configuration')
