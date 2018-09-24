@@ -109,7 +109,7 @@ def printCard(card):
 
     comp_font = getFont(layout['company1']['font'])
     comp_offset = (layout['company1']['x'], layout['company1']['y'])
-    comp_color = (0, 0, 0)
+    comp_color = getColorTuple(layout['company1'])
     draw.text(comp_offset, card[T_COMPANY1], comp_color, font=comp_font)
 
     qrcode = pyqrcode.create(
