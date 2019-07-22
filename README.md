@@ -13,10 +13,10 @@ C:\github\cardprint>cardprint.py "VPMF2018 Kaelakaardi info Piletilevile - Meesk
 
 
 ### CSV example without person picture:
-
+```
 eesnimi,perenimi,lisainfo,kaardigrupp,pildifail,kood
 John,Doe,Most epic band ever,Esineja,,26071402
-
+```
 Configuration folder yaml contains all the card group settings.
 ### FONT names do not work in Windows 10 with installed fonts. Tested and got it to work only with arial
 
